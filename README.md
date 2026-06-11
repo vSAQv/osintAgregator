@@ -1,186 +1,113 @@
-Advanced OSINT Automation Tool
+# 🔍 Advanced OSINT Search Tool
 
-An elegant, zero-dependency, local-first OSINT dashboard designed for
-intelligence analysts and security researchers. This tool automates the process
-of querying diverse online platforms simultaneously by orchestrating structured
-search parameters directly through your web browser.
+<p align="center">
+  <img src="https://img.shields.io/badge/Ban_Probability-0%25-green?style=for-the-badge&logo=shield" alt="0% Ban Probability">
+  <img src="https://img.shields.io/badge/Platform-Web%20Browser-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Architecture-Serverless%20%2F%20Client--Side-orange?style=for-the-badge" alt="Architecture">
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License">
+</p>
 
-📋 Table of Contents
+An elegant, client-side web interface designed to automate and parallelize open-source intelligence (OSINT) gathering. By compiling target indicators locally, the tool orchestrates and executes simultaneous queries across dozens of customizable platforms with a single click.
 
-1.  Core Features
-2.  Prerequisites & Critical Browser Settings
-3.  User Guide: Step-by-Step Operations
-      - 1. Data Entry & Textarea Iteration
-      - 2. Using Field Exclusions
-      - 3. Initiating the Search
-      - 4. Profile Management
-      - 5. Managing Custom OSINT Services
-4.  Custom Service Templating Reference
-5.  Data Portability Schemas
+---
 
-⚡ Core Features
+## 📂 1. Directory Structure
 
-  - Federated Search Orchestration: Launches target queries across dozens of
-    customizable OSINT databases with a single action.
-  - Zero Server Footprint: Completely serverless. All target identifiers, API
-    paths, custom endpoints, and personal notes remain entirely on your local
-    machine.
-  - Flexible Templating Engine: Supports positional parameters ({INPUT}) as well
-    as composite name-surname bindings ({NAME}, {SURNAME}).
-  - Subject Profile Lifecycle: Save, load, update, export, and import complete
-    target dossiers.
-  - Custom Service Manager: Create, update, or remove service definitions
-    natively via the integrated sidebar UI.
+```text
+advanced-osint-tool/
+├── css/
+│   └── style.css             # UI styling with CSS Variables for light/dark themes
+├── js/
+│   └── app.js                # Core JS logic for UI, profiles, and search execution
+├── index.html                # Main application entrance
+├── LICENSE                   # MIT License
+└── README.md                 # Project documentation
+```
 
-⚠️ Prerequisites & Critical Browser Settings
+---
 
-Because this application relies on standard browser APIs to launch
-multi-platform queries, you must configure your browser to allow pop-ups for
-this application before initiating a search.
+## ⚠️ 2. Essential First-Run Step: Pop-up Permissions
 
-Enabling Pop-ups (One-time Setup)
+Because this tool opens multiple tabs simultaneously via the native `window.open()` browser API, modern web browsers will automatically block these actions as "unwanted pop-ups" on your first run.
 
-1.  Open the application (index.html) in your browser.
-2.  Click Launch OSINT Search.
-3.  Observe the address bar: A blocked pop-up icon will appear (typically on the
-    right-hand side of the URL bar).
-4.  Click the icon and select "Always allow pop-ups and redirects from [this
-    source]".
-5.  Click Done and re-run the search.
+### How to Enable Pop-ups:
+1. Open `index.html` in your web browser.
+2. Enter any dummy value in the **Name** input field.
+3. Click the green **Launch OSINT Search** button on the sidebar.
+4. Look at the right side of your browser's address bar. You will see a **Pop-up Blocked** icon.
+5. Click this icon, select **"Always allow pop-ups and redirects from [this address]"**, and click **Done**.
+6. Click **Launch OSINT Search** again to verify that tabs open correctly.
 
-📖 User Guide: Step-by-Step Operations
+---
 
-1. Data Entry & Textarea Iteration
+## 🚀 3. Step-by-Step Usage Guide
 
-The main interface contains categorized input cards. Each input field map
-directly to an active search engine query structure.
+### Step 3.1: Entering Target Identifiers
+Fill in any known indicators of your subject in the categorized input panels:
+*   **Single-Value Fields:** Inputs such as *Name*, *Surname*, *Fathername*, *Phone*, *Address*, or social media handles accept a single string. Leading/trailing spaces are automatically stripped.
+*   **Multi-Line Iterators:** The **E-mail** and **Usernames** fields are multi-line textareas. Input **one value per line**. The search engine will automatically loop through every line, generating and launching a unique search tab for each distinct value.
 
-  - Single-Line Inputs: Fields like Name, Surname, Telegram Tag, and Crypto
-    Wallet accept one distinct string identifier.
-  - Multi-Line Textareas: Fields like E-mail and Usernames process one entity
-    per line. When a search is triggered, the search engine automatically
-    generates and opens a unique search tab for every single line populated in
-    these blocks.
+### Step 3.2: Applying Field Exclusions
+To temporarily disable certain indicators without deleting them:
+*   Check the **Exclude** checkbox next to the input field.
+*   The data remains visually saved in your active workspace (and will be stored if you save the profile), but is ignored entirely by the search query compiler during execution.
 
-2. Using Field Exclusions
+### Step 3.3: Managing Target Profiles
+Profiles let you preserve and switch between active investigation targets.
 
-Next to each input field is a checkbox with a hover title (Exclude this field
-from searches).
+*   **To Save a Profile:**
+    1. Enter a unique identifier in the **New Profile Name** field on the sidebar.
+    2. Click **Save Current**. This writes all current fields, exclusion states, triggers, and general notes into your browser's persistent `localStorage`.
+*   **To Load a Profile:**
+    1. Click the **Select a Profile to Load** dropdown menu.
+    2. Select your target. The form will instantly populate with the saved dossier.
+*   **To Export a Profile:** Select the profile from the dropdown, then click **Export Selected** to download a portable `.json` backup file.
+*   **To Import a Profile:** Click **Import Profile**, choose your exported `.json` file, and confirm.
 
-  - Check this box to dynamically block a parameter from being compiled into the
-    active search execution.
-  - The data remains visually preserved in the input box for reference but will
-    be completely ignored when compiling the active search queue.
+### Step 3.4: Configuring Custom OSINT Services
+Customize the built-in search registry with your own search strings or localized databases:
 
-3. Initiating the Search
+1. Locate the **Manage OSINT Services** panel in the sidebar.
+2. Enter a **Service Name** (e.g., `Shodan IP Lookup`).
+3. Enter the **URL Template** containing variables (e.g., `https://www.shodan.io/host/{INPUT}`).
+4. Select the **Target Input** field (e.g., `ip_address`). This binds the search path. The query will only execute if this specific field is populated on your active dashboard.
+5. Click **Add Service**. The service is compiled, saved locally, and immediately integrated into the active alphabetical list.
 
-1.  Populate your target's known information.
-2.  Ensure you toggle the target-independent trigger boxes if necessary:
-      - Perform Reverse Image Searches: Prepares manual tabs for image search
-        platforms (e.g., Google Images, Yandex Images).
-      - Perform Metadata Lookups: Opens metadata analyzers (e.g., Metadata.app).
-3.  Click the green Launch OSINT Search button on the sidebar.
-4.  A toast notification will appear in the bottom-middle of the screen
-    confirming the precise count of launched searches, and the corresponding
-    tabs will instantiate immediately.
+---
 
-4. Profile Management
+## 🔗 4. URL Templating & Variable Reference
 
-Use the Profiles controller in the sidebar to maintain persistent investigation
-targets.
+When configuring custom services, the engine translates bracketed placeholders inside your templates into sanitized, URL-encoded query parameters.
 
-[ Input Target Data ] ──► [ Enter Profile Name ] ──► [ Click "Save Current" ]
-                                                              │
-                                                     Saved to localStorage
-                                                              │
-[ Export Selected ] ◄── [ Choose Dropdown Item ] ◄────┴──► [ Delete Selected ]
+| Placeholder | Mapped Source Field | Behavior |
+| :--- | :--- | :--- |
+| `{INPUT}` | The selected **Target Input** field. | Direct variable injection. Replaced on every active lookup. |
+| `{NAME}` | **Name** input field. | Dynamically injected if the Name field contains data. |
+| `{SURNAME}`| **Surname** input field. | Dynamically injected if the Surname field contains data. |
 
-  - Saving a Profile:
-    1.  Enter a name in the New Profile Name input field.
-    2.  Click Save Current. This captures all input values, exclusion states,
-        triggers, and general notes, writing them to the browser's localStorage
-        API.
-  - Loading a Profile:
-    1.  Click the Select a Profile to Load dropdown.
-    2.  Choose your desired target. The form will instantaneously rehydrate.
-  - Exporting/Backing Up Target Profiles:
-    1.  Select a profile from the dropdown menu.
-    2.  Click Export Selected. A validated .json file containing the profile
-        payload will automatically download.
-  - Importing Target Profiles:
-    1.  Click the Import Profile label button.
-    2.  Select the exported .json file.
-    3.  If a naming conflict occurs, a browser modal will prompt you to confirm
-        whether you wish to overwrite the existing profile.
+### Template Implementations:
 
-5. Managing Custom OSINT Services
+*   **Standard Target Mapping:**
+    *   *Target Input:* `GitHub Tag`
+    *   *URL Template:* `https://github.com/{INPUT}`
+    *   *Workspace Data:* `octocat` → *Execution URL:* `https://github.com/octocat`
 
-Add your own proprietary workflows, custom APIs, or local search scripts to the
-dynamic orchestrator.
+*   **Composite Full-Name Binding:**
+    *   *Target Input:* `Name-Surname (hyphen)`
+    *   *URL Template:* `https://www.idcrawl.com/{NAME}-{SURNAME}`
+    *   *Workspace Data:* Name: `John`, Surname: `Doe` → *Execution URL:* `https://www.idcrawl.com/John-Doe`
 
-Adding a Service
+*   **Static Trigger Links:**
+    *   *Target Input:* `Trigger: Reverse Image Search`
+    *   *URL Template:* `https://images.google.com/`
+    *   *Behavior:* Injects no query variables, but launches Google Images to allow drag-and-drop actions whenever the **Perform Reverse Image Searches** checkbox is enabled.
 
-1.  Navigate to the Manage OSINT Services section in the sidebar.
-2.  Enter the Service Name (e.g., LeakLookup API).
-3.  Define the URL Template (refer to the Custom Templating section below).
-4.  Use the Target Input selector to bind this service to an explicit form field
-    (e.g., binding to IP Address means this query will only trigger when the IP
-    Address field contains active text).
-5.  (Optional) Provide operating instructions or reference details in the Notes
-    box.
-6.  Click Add Service. The service immediately compiles and sorts alphabetically
-    into your active list.
+---
 
-Editing or Deleting a Service
+## 💾 5. Data Migration Schemas
 
-  - Edit: Click the Edit button on any service item in the sidebar list. The
-    service form fields will populate with the service's parameters. Modify the
-    parameters and click Update Service. To discard changes, click Cancel Edit.
-  - Delete: Click the red Del button on any item. Confirm the system alert to
-    permanently prune the registry.
-
-🔗 Custom Service Templating Reference
-
-The templating engine interprets bracketed placeholders to construct
-fully-qualified domain names and query paths at execution time. All injected
-variables undergo strict encodeURIComponent escaping automatically.
-
-| Placeholder | Context                                                      | Execution Conditions                                         |
-| :---------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
-| `{INPUT}`   | Direct variable replacement of the active target input data. | Required unless the target is a manual site or trigger hook. |
-| `{NAME}`    | Injects the value from the **Name** input field.             | Compiles if Name is populated and not excluded.              |
-| `{SURNAME}` | Injects the value from the **Surname** input field.          | Compiles if Surname is populated and not excluded.           |
-
-Practical URL Construction Examples
-
-  - Objective: Query GitHub user profiles using the github_tag input field.
-  - Target Input: GitHub Tag
-  - Template:
-    https://github.com/{INPUT}
-  - If input value is octocat, execution URL results in:
-    https://github.com/octocat
-
-  - Objective: Query an archive or registry utilizing unified full names
-    separated by a hyphen.
-  - Target Input: Name-Surname (hyphen)
-  - Template:
-    https://www.idcrawl.com/{NAME}-{SURNAME}
-  - If Name is John and Surname is Doe, execution URL results in:
-    https://www.idcrawl.com/John-Doe
-
-  - Objective: Force-launch a landing page with search tools (like Yandex
-    Images) when the global image search trigger is enabled.
-  - Target Input: Trigger: Reverse Image Search
-  - Template:
-    https://yandex.com/images/
-  - Behavior: Injects no variables, but opens the target page in a separate tab
-    when the corresponding checkbox is activated.
-
-💾 Data Portability Schemas
-
-To facilitate easy data migration across different workstations, configuration
-files are handled as plaintext JSON payloads.
-
+### Subject Profile Backup Schema (`.json`)
+```json
 {
   "profileName": "Target_John_Doe",
   "name": "John",
@@ -201,16 +128,19 @@ files are handled as plaintext JSON payloads.
   "vk_tag": "id987654321",
   "crypto_wallet": "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
   "ip_address": "192.168.1.1",
-  "photo_notes": "Identified at NYC Tech Summit 2026",
+  "photo_notes": "Identified at NYC Tech Summit",
   "metadata_notes": "Document metadata points to corporate laptop",
-  "general_notes": "Primary suspect for data exfiltration investigation. Keep tabs updated weekly.",
+  "general_notes": "Target for active investigation.",
   "name_exclude": false,
   "surname_exclude": false,
   "phone_exclude": true,
   "trigger_image_search_cb": true,
   "trigger_metadata_search_cb": false
 }
+```
 
+### OSINT Services Catalog Backup Schema (`.json`)
+```json
 [
   {
     "id": "service_tel_profile",
@@ -231,4 +161,4 @@ files are handled as plaintext JSON payloads.
     "notes": "Uses composite parameters {NAME} and {SURNAME}"
   }
 ]
-
+```

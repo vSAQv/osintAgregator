@@ -1,7 +1,6 @@
 # 🔍 Advanced OSINT Search Tool
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Ban_Probability-0%25-green?style=for-the-badge&logo=shield" alt="0% Ban Probability">
   <img src="https://img.shields.io/badge/Platform-Web%20Browser-blue?style=for-the-badge" alt="Platform">
   <img src="https://img.shields.io/badge/Architecture-Serverless%20%2F%20Client--Side-orange?style=for-the-badge" alt="Architecture">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License">

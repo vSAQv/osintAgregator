@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced OSINT Search Tool</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-sticky-content">
+                <h2>Controls</h2>
+
+                <div class="sidebar-section">
+                    <h3>Theme</h3>
+                    <button id="themeToggleBtn">Toggle Dark Mode</button>
+                </div>
+
+                <div class="sidebar-section profile-management">
+                    <h3>Profiles</h3>
+                    <input type="text" id="profileName" placeholder="New Profile Name">
+                    <div class="button-group">
+                        <button id="saveProfileBtn" class="btn-primary">Save Current</button>
+                        <button id="deleteProfileBtn" class="btn-danger">Delete Selected</button>
+                    </div>
+                    <select id="profileSelector">
+                        <option value="">Select a Profile to Load</option>
+                    </select>
+                    <div class="button-group import-export-buttons">
+                        <button id="exportProfileBtn" class="btn-secondary">Export Selected</button>
+                        <label for="importProfileInput" class="btn btn-secondary">Import Profile</label>
+                        <input type="file" id="importProfileInput" accept=".json" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Search</h3>
+                    <button id="searchBtn" class="btn-success btn-large">Launch OSINT Search</button>
+                </div>
+
+                <div class="sidebar-section osint-service-manager">
+                    <h3>Manage OSINT Services</h3>
+                    <div id="osintServicesListContainer">
+                        <p>Loading services...</p>
+                    </div>
+                     <div class="button-group import-export-buttons">
+                        <button id="exportServicesBtn" class="btn-secondary">Export All Services</button>
+                        <label for="importServicesInput" class="btn btn-secondary">Import Services</label>
+                        <input type="file" id="importServicesInput" accept=".json" style="display: none;">
+                    </div>
+                    <h4><span id="serviceFormTitle">Add New</span> Service</h4>
+                    <input type="hidden" id="editingServiceId">
+                    <input type="text" id="serviceName" placeholder="Service Name (e.g., My User Search)">
+                    <input type="text" id="serviceUrlTemplate" placeholder="URL Template (e.g., https://site.com?q={INPUT})">
+                    <select id="serviceTargetInput">
+                        <option value="name">Name</option>
+                        <option value="surname">Surname</option>
+                        <option value="name_surname_hyphen">Name-Surname (hyphen)</option>
+                        <option value="name_surname_plus">Name-Surname (plus)</option>
+                        <option value="name_surname_space">Name-Surname (space)</option>
+                        <option value="fathername">Fathername</option>
+                        <option value="phone">Phone Number</option>
+                        <option value="address">Address</option>
+                        <option value="email">E-mail (iterates multiple)</option>
+                        <option value="generic_username">Generic Username (iterates multiple)</option>
+                        <option value="telegram_tag">Telegram Tag (username, no @)</option>
+                        <option value="instagram_tag">Instagram Tag</option>
+                        <option value="tiktok_tag">TikTok Tag (username, no @)</option>
+                        <option value="github_tag">GitHub Tag</option>
+                        <option value="facebook_username">Facebook Username/ID</option>
+                        <option value="linkedin_username">LinkedIn Username/Path</option>
+                        <option value="x_tag">X (Twitter) Tag</option>
+                        <option value="discord_tag">Discord Tag</option>
+                        <option value="vk_tag">VK Tag/ID</option>
+                        <option value="crypto_wallet">Crypto Wallet</option>
+                        <option value="ip_address">IP Address</option>
+                        <option value="photo_notes">Photo Notes (uses note field for context)</option>
+                        <option value="metadata_notes">Metadata Notes (uses note field for context)</option>
+                        <option value="trigger_image_search">Trigger: Reverse Image Search (no specific input)</option>
+                        <option value="trigger_metadata_search">Trigger: Metadata Lookup (no specific input)</option>
+                    </select>
+                    <textarea id="serviceNotes" placeholder="Optional: Notes (e.g., required format, placeholders like {NAME}, {SURNAME})" rows="2"></textarea>
+                    <div class="button-group">
+                        <button id="addServiceBtn" class="btn-primary">Add Service</button>
+                        <button id="cancelEditServiceBtn" class="btn-secondary" style="display:none;">Cancel Edit</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>OSINT Data Input</h1>
+            </header>
+
+            <div class="search-form-grid">
+                <div class="form-section">
+                    <h2>Personal Info</h2>
+                    <div class="form-group"><label for="name">Name:</label><input type="text" id="name"><input type="checkbox" id="name_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="surname">Surname:</label><input type="text" id="surname"><input type="checkbox" id="surname_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="fathername">Fathername:</label><input type="text" id="fathername"><input type="checkbox" id="fathername_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="phone">Phone Number:</label><input type="text" id="phone" placeholder="+1234567890"><input type="checkbox" id="phone_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="address">Address:</label><input type="text" id="address"><input type="checkbox" id="address_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="email">E-mail (one per line):</label><textarea id="email" rows="3"></textarea><input type="checkbox" id="email_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Social & Online</h2>
+                    <div class="form-group"><label for="generic_username">Usernames (one per line):</label><textarea id="generic_username" rows="3"></textarea><input type="checkbox" id="generic_username_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="telegram_tag">Telegram Tag:</label><input type="text" id="telegram_tag" placeholder="username (no @)"><input type="checkbox" id="telegram_tag_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="instagram_tag">Instagram Tag:</label><input type="text" id="instagram_tag"><input type="checkbox" id="instagram_tag_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="tiktok_tag">TikTok Tag:</label><input type="text" id="tiktok_tag" placeholder="username (no @)"><input type="checkbox" id="tiktok_tag_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="github_tag">GitHub Tag:</label><input type="text" id="github_tag"><input type="checkbox" id="github_tag_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="facebook_username">Facebook Username/ID:</label><input type="text" id="facebook_username"><input type="checkbox" id="facebook_username_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="linkedin_username">LinkedIn Username/Path:</label><input type="text" id="linkedin_username"><input type="checkbox" id="linkedin_username_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="x_tag">X (Twitter) Tag:</label><input type="text" id="x_tag"><input type="checkbox" id="x_tag_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="discord_tag">Discord Tag:</label><input type="text" id="discord_tag"><input type="checkbox" id="discord_tag_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="vk_tag">VK Tag/ID:</label><input type="text" id="vk_tag"><input type="checkbox" id="vk_tag_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                </div>
+
+                <div class="form-section">
+                    <h2>Other Info</h2>
+                    <div class="form-group"><label for="crypto_wallet">Crypto Wallet Address:</label><input type="text" id="crypto_wallet"><input type="checkbox" id="crypto_wallet_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group"><label for="ip_address">IP Address:</label><input type="text" id="ip_address"><input type="checkbox" id="ip_address_exclude" class="exclude-cb" title="Exclude this field from searches"></div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="trigger_image_search_cb"> <label for="trigger_image_search_cb">Perform Reverse Image Searches</label>
+                    </div>
+                     <div class="form-group">
+                        <label for="photo_notes">Image Notes/Context (not directly searched):</label>
+                        <input type="text" id="photo_notes" placeholder="e.g., Photo from conference X">
+                        <input type="checkbox" id="photo_notes_exclude" class="exclude-cb" title="Exclude this field from searches">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="trigger_metadata_search_cb"> <label for="trigger_metadata_search_cb">Perform Metadata Lookups</label>
+                    </div>
+                     <div class="form-group">
+                        <label for="metadata_notes">Metadata File/URL Hint (not directly searched):</label>
+                        <input type="text" id="metadata_notes" placeholder="e.g., document.pdf from source Y">
+                        <input type="checkbox" id="metadata_notes_exclude" class="exclude-cb" title="Exclude this field from searches">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section notes-section">
+                <h2>General Notes (Saved with Profile)</h2>
+                <textarea id="general_notes" placeholder="Make your notes here... (not used in automated search unless specified by a custom service)" rows="6"></textarea>
+            </div>
+        </main>
+    </div>
+
+    <div id="toastNotification" class="toast"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
